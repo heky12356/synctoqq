@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -68,19 +69,22 @@ func handleWebhook(c *gin.Context) {
 			return
 		}
 
-		//设置为精华消息
+		// 设置为精华消息
 		err = setEssenceMsg(message_id)
 		if err != nil {
 			fmt.Println("Error setting essence message:", err)
 			return
 		}
 
-		//设置为群公告
+		// 设置为群公告
 		err = setGroupNotice(msg, int64(group_id))
 		if err != nil {
 			fmt.Println("Error setting essence message:", err)
 			return
 		}
+
+		// 获取图片
+		getimg(hbody)
 	}
 
 	c.JSON(http.StatusOK, gin.H{"status": "Webhook received"})
@@ -406,4 +410,43 @@ func loadConfig(filename string) (*Config, error) {
 	}
 
 	return &config, nil
+}
+
+func getimg(input string) {
+	// 创建请求数据
+	data := ImageInput{Input: input}
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		fmt.Println("Error marshalling JSON:", err)
+		return
+	}
+
+	// 发送 POST 请求
+	resp, err := http.Post(config.MdToImgApi, "application/json", bytes.NewBuffer(jsonData))
+	if err != nil {
+		fmt.Println("Error sending POST request:", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	// 检查响应状态码
+	if resp.StatusCode != http.StatusOK {
+		fmt.Println("Error: received non-200 response code:", resp.StatusCode)
+		return
+	}
+
+	// 创建文件保存图片
+	out, err := os.Create("/img/output.png")
+	if err != nil {
+		fmt.Println("Error creating file:", err)
+		return
+	}
+	defer out.Close()
+
+	// 将响应数据写入文件
+	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		fmt.Println("Error saving image:", err)
+		return
+	}
 }

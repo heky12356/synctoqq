@@ -19,6 +19,7 @@ type Config struct {
 	ServerPort   string `json:"server_port"`
 	GroupID      int64  `json:"group_id"`
 	WebSocketURL string `json:"websocket_url"`
+	MdToImgApi   string `json:"md_to_img_api"`
 }
 
 type PrivateMessage struct {
@@ -50,6 +51,10 @@ type Group_notice struct {
 	Action string         `json:"action"`
 	Params gMessageParams `json:"params"`
 	Echo   string         `json:"echo"`
+}
+
+type ImageInput struct {
+	Input string `json:"input"`
 }
 
 var config *Config
