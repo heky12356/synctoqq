@@ -44,9 +44,10 @@ func handleWebhook(c *gin.Context) {
 	var titlet string
 	var bodyt string
 	titlet = "[" + class + "]" + _title
-	if class == "茶话会" {
+	switch class {
+	case "茶话会":
 		bodyt = "日期：" + date + " " + "时长：" + time + "\n" + hbody
-	} else {
+	default:
 		bodyt = ""
 	}
 	msg := map[string]string{
@@ -115,13 +116,13 @@ func sendMessageToWebSocket(message map[string]string, group_id int64) (int32, e
 	}
 	defer ws.Close()
 
-	// 将github issue中的消息利用接口发送到qq
+	// 将 github issue中的消息利用接口发送到qq
 
 	body := message["title"] + "\n" + message["body"] + "\n" + "链接：" + message["url"]
 	msg := PrivateMessage{
 		Action: "send_group_msg",
 		Params: MessageParams{
-			Group_id: group_id, // 替换为实际的 QQ 用户ID
+			Group_id: group_id, // 替换为实际的 QQ 用户 ID
 			Message:  body,     // 要发送的消息内容
 		},
 		Echo: "send_msg",
