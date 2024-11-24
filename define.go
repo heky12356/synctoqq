@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -19,7 +20,7 @@ type Config struct {
 	ServerPort   string `json:"server_port"`
 	GroupID      int64  `json:"group_id"`
 	WebSocketURL string `json:"websocket_url"`
-	MdToImgApi   string `json:"md_to_img_api"`
+	MdToImgURL   string `json:"md_to_img_url"`
 }
 
 type PrivateMessage struct {
@@ -58,3 +59,9 @@ type ImageInput struct {
 }
 
 var config *Config
+
+var currentDate string
+
+func timeinit() {
+	currentDate = time.Now().Format("2006/01/02")
+}
